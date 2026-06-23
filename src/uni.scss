@@ -1,0 +1,174 @@
+/**
+ * uni-app 内置样式变量 + 自定义主题
+ * Flat Design + Teal 色系 (基于 ui-ux-pro-max 设计框架)
+ */
+
+/* ========== 自定义主题色 ========== */
+:root {
+  /* 主色调 - Teal */
+  --color-primary: #0D9488;
+  --color-primary-light: #2DD4BF;
+  --color-primary-dark: #0F766E;
+  --color-primary-50: #F0FDFA;
+  --color-primary-100: #CCFBF1;
+
+  /* 辅助色 */
+  --color-secondary: #334155;
+  --color-accent: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* 背景色 */
+  --bg-primary: #F0FDFA;
+  --bg-secondary: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F8FAFC;
+  --bg-muted: #F1F5F9;
+
+  /* 文字色 */
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-inverse: #FFFFFF;
+  --text-disabled: #94A3B8;
+
+  /* 边框色 */
+  --border-light: #E2E8F0;
+  --border-medium: #CBD5E1;
+  --border-focus: #0D9488;
+
+  /* 阴影 (极淡) */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.06);
+  --shadow-focus: 0 0 0 3px rgba(13, 148, 136, 0.2);
+
+  /* 圆角 (偏小, Flat Design) */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* 过渡 */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+
+  /* 安全区域 */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-normal: 0ms;
+    --transition-slow: 0ms;
+  }
+}
+
+/* ========== uni-app 内置变量覆盖 ========== */
+
+/* 行为相关颜色 */
+$uni-color-primary: #0D9488;
+$uni-color-success: #22C55E;
+$uni-color-warning: #F59E0B;
+$uni-color-error: #EF4444;
+
+/* 文字基本颜色 */
+$uni-text-color: #0F172A;
+$uni-text-color-inverse: #FFFFFF;
+$uni-text-color-grey: #64748B;
+$uni-text-color-placeholder: #CBD5E1;
+$uni-text-color-disable: #E2E8F0;
+
+/* 背景颜色 */
+$uni-bg-color: #FFFFFF;
+$uni-bg-color-grey: #F8FAFC;
+$uni-bg-color-hover: #F1F5F9;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.5);
+
+/* 边框颜色 */
+$uni-border-color: #E2E8F0;
+
+/* 文字尺寸 */
+$uni-font-size-sm: 12px;
+$uni-font-size-base: 14px;
+$uni-font-size-lg: 16px;
+
+/* Border Radius */
+$uni-border-radius-sm: 8px;
+$uni-border-radius-base: 12px;
+$uni-border-radius-lg: 16px;
+$uni-border-radius-circle: 50%;
+
+/* 间距 */
+$uni-spacing-row-sm: 8px;
+$uni-spacing-row-base: 16px;
+$uni-spacing-row-lg: 24px;
+
+$uni-spacing-col-sm: 8px;
+$uni-spacing-col-base: 16px;
+$uni-spacing-col-lg: 24px;
+
+/* ========== 通用工具类 ========== */
+
+/* 卡片基础样式 (Flat Design: 白底+细边框+极淡阴影) */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  transition: transform var(--transition-fast);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+/* 文字截断 */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Flex 布局 */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 纯色背景 (替代渐变) */
+.solid-primary {
+  background: var(--color-primary);
+}
+
+/* 焦点状态 */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: var(--shadow-focus);
+  border-color: var(--border-focus);
+}
