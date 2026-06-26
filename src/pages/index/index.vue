@@ -10,7 +10,7 @@
 
     <!-- 主操作区 -->
     <view class="actions-section">
-      <view class="action-card primary" @tap="showCountModal = true" hover-class="action-press">
+      <view class="action-card primary" @tap="openModal" hover-class="action-press">
         <view class="action-icon primary-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -88,11 +88,11 @@
       <text class="empty-sub">点击底部「题库」标签导入Excel文件开始刷题</text>
     </view>
 
-    <!-- 题数选择弹窗 -->
+    <!-- 刷题方式选择弹窗 -->
     <view class="modal-mask" v-if="showCountModal" @tap="showCountModal = false">
       <view class="modal-content" @tap.stop>
         <view class="modal-header">
-          <text class="modal-title">选择题数</text>
+          <text class="modal-title">{{ practiceMode ? (practiceMode === 'exam' ? '模拟考试' : '专项训练') : '选择刷题方式' }}</text>
           <view class="modal-close" @tap="showCountModal = false">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -100,43 +100,159 @@
             </svg>
           </view>
         </view>
-        <text class="modal-hint">共 {{ totalQuestions }} 题可用</text>
+        <text class="modal-hint" v-if="!practiceMode">共 {{ totalQuestions }} 题可用</text>
 
-        <view class="preset-grid">
-          <view
-            v-for="n in presetCounts"
-            :key="n"
-            class="preset-item"
-            :class="{ active: selectedCount === n && !isCustomInput }"
-            @tap="selectPreset(n)"
-          >
-            <text class="preset-num">{{ n }}</text>
+        <!-- 第一步：选择刷题方式 -->
+        <view v-if="!practiceMode" class="mode-selection">
+          <view class="mode-card exam" @tap="practiceMode = 'exam'">
+            <view class="mode-icon exam-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </view>
+            <view class="mode-info">
+              <text class="mode-title">模拟考试</text>
+              <text class="mode-desc">固定150题，按判断:单选:多选=2:5:3出题</text>
+            </view>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </view>
-          <view
-            class="preset-item"
-            :class="{ active: isCustomInput }"
-            @tap="isCustomInput = true; selectedCount = 0"
-          >
-            <text class="preset-num">自定义</text>
+
+          <view class="mode-card special" @tap="practiceMode = 'special'">
+            <view class="mode-icon special-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </view>
+            <view class="mode-info">
+              <text class="mode-title">专项训练</text>
+              <text class="mode-desc">按题型或科目针对性练习</text>
+            </view>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </view>
         </view>
 
-        <view v-if="isCustomInput" class="custom-input-wrap">
-          <input
-            class="custom-input"
-            type="number"
-            placeholder="输入题目数量"
-            :value="customCount"
-            @input="onCustomInput"
-          />
+        <!-- 第二步：专项训练 - 选择专项类型 -->
+        <view v-if="practiceMode === 'special' && !specialType" class="special-type-selection">
+          <view class="special-type-card" @tap="specialType = 'type'">
+            <view class="special-type-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </view>
+            <text class="special-type-title">题型专项</text>
+            <text class="special-type-desc">单选/多选/判断</text>
+          </view>
+
+          <view class="special-type-card" @tap="specialType = 'bank'">
+            <view class="special-type-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </view>
+            <text class="special-type-title">科目专项</text>
+            <text class="special-type-desc">按题库分类</text>
+          </view>
+        </view>
+
+        <!-- 第三步：选择题型 -->
+        <view v-if="practiceMode === 'special' && specialType === 'type'" class="type-selection">
+          <view 
+            class="type-option" 
+            :class="{ active: selectedType === 'single' }"
+            @tap="selectedType = 'single'"
+          >
+            <text class="type-label">单选</text>
+          </view>
+          <view 
+            class="type-option" 
+            :class="{ active: selectedType === 'multiple' }"
+            @tap="selectedType = 'multiple'"
+          >
+            <text class="type-label">多选</text>
+          </view>
+          <view 
+            class="type-option" 
+            :class="{ active: selectedType === 'judge' }"
+            @tap="selectedType = 'judge'"
+          >
+            <text class="type-label">判断</text>
+          </view>
+        </view>
+
+        <!-- 第三步：选择题库 -->
+        <view v-if="practiceMode === 'special' && specialType === 'bank'" class="bank-selection">
+          <view 
+            v-for="bank in banks" 
+            :key="bank.id"
+            class="bank-option" 
+            :class="{ active: selectedBankId === bank.id }"
+            @tap="selectedBankId = bank.id"
+          >
+            <text class="bank-name">{{ bank.name }}</text>
+            <text class="bank-count">{{ bank.total }}题</text>
+          </view>
+          <view v-if="banks.length === 0" class="empty-banks">
+            <text class="empty-text">暂无题库，请先导入</text>
+          </view>
+        </view>
+
+        <!-- 第四步：选择题数 -->
+        <view v-if="(practiceMode === 'special' && specialType && ((specialType === 'type' && selectedType) || (specialType === 'bank' && selectedBankId)))" class="count-selection">
+          <text class="count-hint">选择题目数量</text>
+          <view class="preset-grid">
+            <view
+              v-for="n in presetCounts"
+              :key="n"
+              class="preset-item"
+              :class="{ active: selectedCount === n && !isCustomInput }"
+              @tap="selectPreset(n)"
+            >
+              <text class="preset-num">{{ n }}</text>
+            </view>
+            <view
+              class="preset-item"
+              :class="{ active: isCustomInput }"
+              @tap="isCustomInput = true; selectedCount = 0"
+            >
+              <text class="preset-num">自定义</text>
+            </view>
+          </view>
+
+          <view v-if="isCustomInput" class="custom-input-wrap">
+            <input
+              class="custom-input"
+              type="number"
+              placeholder="输入题目数量"
+              :value="customCount"
+              @input="onCustomInput"
+            />
+          </view>
         </view>
 
         <view class="modal-actions">
-          <view class="modal-btn cancel" @tap="showCountModal = false">
-            <text class="modal-btn-text">取消</text>
+          <view class="modal-btn cancel" @tap="practiceMode ? resetModal() : showCountModal = false">
+            <text class="modal-btn-text">{{ practiceMode ? '返回' : '取消' }}</text>
           </view>
-          <view class="modal-btn confirm" @tap="startPractice">
-            <text class="modal-btn-text">开始</text>
+          <view 
+            class="modal-btn confirm" 
+            :class="{ disabled: !canStartPractice }"
+            @tap="canStartPractice && startPractice()"
+          >
+            <text class="modal-btn-text">{{ practiceMode === 'exam' ? '开始考试' : '开始练习' }}</text>
           </view>
         </view>
       </view>
@@ -145,14 +261,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getTotalQuestionCount, getWrongQuestions, clearAllWrongs } from '@/utils/db'
+import { ref, onMounted, computed } from 'vue'
+import { getTotalQuestionCount, getWrongQuestions, clearAllWrongs, getBanks, getExamQuestions, getRandomQuestionsByType, getRandomQuestionsByBankAndType } from '@/utils/db'
 
 const statusBarHeight = ref(0)
 const totalQuestions = ref(0)
 const totalWrongs = ref(0)
 
 const showCountModal = ref(false)
+const practiceMode = ref<'exam' | 'special' | ''>('') // 考试模式、专项模式
+const specialType = ref<'type' | 'bank' | ''>('') // 题型专项、科目专项
+const selectedType = ref('') // 选择的题型
+const selectedBankId = ref(0) // 选择的题库ID
+const banks = ref<any[]>([])
+
 const presetCounts = [10, 20, 30, 50, 100]
 const selectedCount = ref(20)
 const isCustomInput = ref(false)
@@ -168,6 +290,7 @@ const loadData = async () => {
   totalQuestions.value = await getTotalQuestionCount()
   const wrongs = await getWrongQuestions()
   totalWrongs.value = wrongs.length
+  banks.value = await getBanks()
 }
 
 const clearWrongs = async () => {
@@ -189,28 +312,89 @@ const selectPreset = (n: number) => {
   selectedCount.value = n
 }
 
+const resetModal = () => {
+  practiceMode.value = ''
+  specialType.value = ''
+  selectedType.value = ''
+  selectedBankId.value = 0
+  selectedCount.value = 20
+  isCustomInput.value = false
+  customCount.value = ''
+}
+
+const openModal = () => {
+  resetModal()
+  showCountModal.value = true
+}
+
 const onCustomInput = (e: any) => {
   customCount.value = e.detail.value
   selectedCount.value = Number(e.detail.value) || 0
 }
 
-const startPractice = () => {
+const canStartPractice = computed(() => {
+  if (practiceMode.value === 'exam') {
+    return true
+  }
+  if (practiceMode.value === 'special') {
+    if (specialType.value === 'type') {
+      return selectedType.value && selectedCount.value > 0
+    }
+    if (specialType.value === 'bank') {
+      return selectedBankId.value && selectedCount.value > 0
+    }
+  }
+  return false
+})
+
+const startPractice = async () => {
   if (totalQuestions.value === 0) {
     uni.showToast({ title: '请先导入题库', icon: 'none' })
     return
   }
 
-  const count = isCustomInput.value ? Number(customCount.value) : selectedCount.value
-  if (!count || count <= 0) {
-    uni.showToast({ title: '请输入有效题数', icon: 'none' })
-    return
+  if (practiceMode.value === 'exam') {
+    // 模拟考试模式
+    showCountModal.value = false
+    uni.navigateTo({
+      url: `/pages/practice/practice?bankId=0&name=模拟考试&count=150&type=exam`
+    })
+  } else if (practiceMode.value === 'special') {
+    // 专项训练模式
+    if (specialType.value === 'type') {
+      // 题型专项
+      if (!selectedType.value) {
+        uni.showToast({ title: '请选择题型', icon: 'none' })
+        return
+      }
+      const count = isCustomInput.value ? Number(customCount.value) : selectedCount.value
+      if (!count || count <= 0) {
+        uni.showToast({ title: '请输入有效题数', icon: 'none' })
+        return
+      }
+      showCountModal.value = false
+      const typeName = selectedType.value === 'single' ? '单选' : selectedType.value === 'multiple' ? '多选' : '判断'
+      uni.navigateTo({
+        url: `/pages/practice/practice?bankId=0&name=${typeName}专项&count=${count}&type=special&typeValue=${selectedType.value}`
+      })
+    } else if (specialType.value === 'bank') {
+      // 科目专项
+      if (!selectedBankId.value) {
+        uni.showToast({ title: '请选择题库', icon: 'none' })
+        return
+      }
+      const count = isCustomInput.value ? Number(customCount.value) : selectedCount.value
+      if (!count || count <= 0) {
+        uni.showToast({ title: '请输入有效题数', icon: 'none' })
+        return
+      }
+      const bank = banks.value.find(b => b.id === selectedBankId.value)
+      showCountModal.value = false
+      uni.navigateTo({
+        url: `/pages/practice/practice?bankId=${selectedBankId.value}&name=${bank?.name || '题库'}专项&count=${count}&type=special`
+      })
+    }
   }
-
-  const actualCount = Math.min(count, totalQuestions.value)
-  showCountModal.value = false
-  uni.navigateTo({
-    url: `/pages/practice/practice?bankId=0&name=混合练习&count=${actualCount}`
-  })
 }
 
 const goToWrong = () => {
@@ -595,5 +779,226 @@ const goToTab = (url: string) => {
 .clear-wrongs-btn:active {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(0.9);
+}
+
+/* 刷题方式选择 */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mode-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.mode-card:active {
+  transform: scale(0.98);
+}
+
+.mode-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.exam-icon {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.special-icon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.mode-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mode-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 专项类型选择 */
+.special-type-selection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.special-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.special-type-card:active {
+  transform: scale(0.96);
+}
+
+.special-type-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.special-type-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.special-type-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* 题型选择 */
+.type-selection {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.type-option {
+  flex: 1;
+  padding: 14px 8px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.type-option.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-50);
+}
+
+.type-option:active {
+  transform: scale(0.96);
+}
+
+.type-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.type-option.active .type-label {
+  color: var(--color-primary);
+}
+
+/* 题库选择 */
+.bank-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.bank-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.bank-option.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-50);
+}
+
+.bank-option:active {
+  transform: scale(0.98);
+}
+
+.bank-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bank-count {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.empty-banks {
+  padding: 30px;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* 题数选择 */
+.count-selection {
+  margin-bottom: 20px;
+}
+
+.count-hint {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* 禁用按钮 */
+.modal-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-btn.disabled:active {
+  transform: none;
 }
 </style>

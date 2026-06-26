@@ -33,6 +33,7 @@ interface WrongQuestion {
   wrongCount: number
   lastWrongAt: Date
   isMastered: number
+  bankName?: string
 }
 
 class QuizDatabase extends Dexie {
@@ -48,6 +49,10 @@ class QuizDatabase extends Dexie {
       questions: '++id, bankId, chapter, difficulty',
       records: '++id, questionId, createdAt',
       wrongs: '++id, questionId, isMastered'
+    })
+    this.version(2).stores({
+      questions: '++id, bankId, chapter, difficulty, type',
+      wrongs: '++id, questionId, isMastered, bankName'
     })
   }
 }
@@ -81,12 +86,48 @@ export const getQuestionsByIds = async (ids: number[]) => {
   return questions.filter(Boolean).map(q => ({ ...q!, id: q!.id }))
 }
 
+// 按题型获取随机题目
+export const getRandomQuestionsByType = async (type: string, count: number) => {
+  const questions = await db.questions.where('type').equals(type).toArray()
+  const shuffled = questions.sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count).map(q => ({ ...q, id: q.id }))
+}
+
+// 按题库和题型获取随机题目
+export const getRandomQuestionsByBankAndType = async (bankId: number, type: string, count: number) => {
+  const questions = await db.questions.where('bankId').equals(bankId).toArray()
+  const filtered = questions.filter(q => q.type === type)
+  const shuffled = filtered.sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count).map(q => ({ ...q, id: q.id }))
+}
+
+// 模拟考试出题：判断:单选:多选 = 2:5:3，共150题
+export const getExamQuestions = async () => {
+  const totalQuestions = 150
+  const judgeCount = 30  // 2/10 * 150
+  const singleCount = 75 // 5/10 * 150
+  const multipleCount = 45 // 3/10 * 150
+
+  const allQuestions = await db.questions.toArray()
+  const judgeQuestions = allQuestions.filter(q => q.type === 'judge')
+  const singleQuestions = allQuestions.filter(q => q.type === 'single')
+  const multipleQuestions = allQuestions.filter(q => q.type === 'multiple')
+
+  const shuffle = (arr: any[]) => arr.sort(() => Math.random() - 0.5)
+
+  const selectedJudge = shuffle(judgeQuestions).slice(0, judgeCount).map(q => ({ ...q, id: q.id }))
+  const selectedSingle = shuffle(singleQuestions).slice(0, singleCount).map(q => ({ ...q, id: q.id }))
+  const selectedMultiple = shuffle(multipleQuestions).slice(0, multipleCount).map(q => ({ ...q, id: q.id }))
+
+  return [...selectedJudge, ...selectedSingle, ...selectedMultiple]
+}
+
 export const getTotalQuestionCount = () => db.questions.count()
 
 export const addRecord = (questionId: number, userAnswer: string, isCorrect: boolean) =>
   db.records.add({ questionId, userAnswer, isCorrect: isCorrect ? 1 : 0, createdAt: new Date() }) as Promise<number>
 
-export const addWrong = async (questionId: number) => {
+export const addWrong = async (questionId: number, bankName?: string) => {
   if (!questionId) {
     console.error('addWrong: questionId is undefined')
     return
@@ -98,7 +139,7 @@ export const addWrong = async (questionId: number) => {
       lastWrongAt: new Date()
     })
   } else {
-    await db.wrongs.add({ questionId, wrongCount: 1, lastWrongAt: new Date(), isMastered: 0 })
+    await db.wrongs.add({ questionId, wrongCount: 1, lastWrongAt: new Date(), isMastered: 0, bankName })
   }
 }
 

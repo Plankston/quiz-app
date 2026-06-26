@@ -62,6 +62,7 @@
         <view class="progress-section">
           <view class="progress-info">
             <text class="progress-text">第 {{ currentIndex + 1 }}/{{ questions.length }} 题</text>
+            <text class="bank-name" v-if="bankName">{{ bankName }}</text>
           </view>
           <view class="progress-bar">
             <view class="progress-fill" :style="{ width: answeredPercent + '%' }"></view>
@@ -177,7 +178,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getRandomQuestions, getAllRandomQuestions, getQuestionsByIds, addRecord, addWrong, masterWrongByQuestionId } from '@/utils/db'
+import { getRandomQuestions, getAllRandomQuestions, getQuestionsByIds, addRecord, addWrong, masterWrongByQuestionId, getExamQuestions, getRandomQuestionsByType, getRandomQuestionsByBankAndType } from '@/utils/db'
 
 const questions = ref<any[]>([])
 const currentIndex = ref(0)
@@ -191,6 +192,8 @@ const bankId = ref(0)
 const bankName = ref('')
 const countParam = ref(100)
 const idsParam = ref('')
+const practiceType = ref('') // exam, special
+const typeValue = ref('') // 题型值：single, multiple, judge
 
 const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
@@ -205,6 +208,8 @@ onMounted(() => {
   bankName.value = decodeURIComponent(page.options.name || '')
   countParam.value = Number(page.options.count || 100)
   idsParam.value = page.options.ids || ''
+  practiceType.value = page.options.type || ''
+  typeValue.value = page.options.typeValue || ''
   uni.setNavigationBarTitle({ title: bankName.value })
   loadQuestions()
 })
@@ -246,7 +251,21 @@ const loadQuestions = async () => {
   uni.showLoading({ title: '加载中...' })
   const count = countParam.value || 100
 
-  if (idsParam.value) {
+  if (practiceType.value === 'exam') {
+    // 模拟考试模式
+    questions.value = await getExamQuestions()
+  } else if (practiceType.value === 'special') {
+    // 专项训练模式
+    if (typeValue.value) {
+      // 题型专项
+      questions.value = await getRandomQuestionsByType(typeValue.value, count)
+    } else if (bankId.value > 0) {
+      // 科目专项
+      questions.value = await getRandomQuestions(bankId.value, count)
+    } else {
+      questions.value = await getAllRandomQuestions(count)
+    }
+  } else if (idsParam.value) {
     const ids = idsParam.value.split(',').map(Number).filter(Boolean)
     questions.value = await getQuestionsByIds(ids)
   } else if (bankId.value === 0) {
@@ -378,7 +397,7 @@ const finishPractice = async () => {
     await addRecord(q.id!, userLetter, isCorrect)
 
     if (!isCorrect && q.id) {
-      await addWrong(q.id)
+      await addWrong(q.id, bankName.value)
       newWrong.push({ ...q, yourAnswer: userLetter || '(未作答)' })
     } else if (isCorrect && q.id) {
       await masterWrongByQuestionId(q.id)
@@ -639,14 +658,21 @@ const retryAll = () => {
   color: var(--text-primary);
 }
 
+.bank-name {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
 .question-type {
   font-size: 11px;
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   color: #fff;
   font-weight: 600;
-  margin-bottom: 12px;
-  display: inline-block;
+  margin-bottom: 16px;
+  display: block;
+  width: fit-content;
 }
 .question-type.single { background: #0D9488; }
 .question-type.multiple { background: #F59E0B; }
@@ -699,12 +725,12 @@ const retryAll = () => {
 }
 
 .nav-item {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 6px;
   background: #F1F5F9;
   border: 1.5px solid transparent;
   transition: all 0.2s ease;
@@ -727,7 +753,7 @@ const retryAll = () => {
 }
 
 .nav-num {
-  font-size: 11px;
+  font-size: 12px;
   color: #334155;
   font-weight: 500;
 }
