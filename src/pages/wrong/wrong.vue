@@ -6,6 +6,13 @@
         <text class="title">错题本</text>
         <AppBadge v-if="wrongList.length > 0" :content="wrongList.length" size="md" color="#EF4444" />
       </view>
+      <view v-if="wrongList.length > 0" class="clear-btn" @tap="clearWrongs">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <text>清除</text>
+      </view>
     </view>
 
     <!-- 错题列表 -->
@@ -80,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getWrongWithDetails, masterWrong } from '@/utils/db'
+import { getWrongWithDetails, masterWrong, clearAllWrongs } from '@/utils/db'
 import AppBadge from '@/components/AppBadge.vue'
 import AppEmpty from '@/components/AppEmpty.vue'
 
@@ -105,6 +112,20 @@ const masterQuestion = async (id: number) => {
   uni.showToast({ title: '已掌握', icon: 'success' })
 }
 
+const clearWrongs = async () => {
+  uni.showModal({
+    title: '确认清除',
+    content: '确定要清除所有错题记录吗？',
+    success: async (res) => {
+      if (res.confirm) {
+        await clearAllWrongs()
+        await loadWrong()
+        uni.showToast({ title: '已清除', icon: 'success' })
+      }
+    }
+  })
+}
+
 const startReview = () => {
   const ids = wrongList.value.map(w => w.questionId).join(',')
   uni.navigateTo({
@@ -124,6 +145,9 @@ const startReview = () => {
 /* 头部 */
 .wrong-header {
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-main {
@@ -136,6 +160,23 @@ const startReview = () => {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #64748B;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.clear-btn:active {
+  background: #E2E8F0;
 }
 
 /* 错题列表 */

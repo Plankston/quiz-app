@@ -37,6 +37,12 @@
           <text class="action-title">错题重考</text>
           <text class="action-desc">{{ totalWrongs }}道错题待复习</text>
         </view>
+        <view v-if="totalWrongs > 0" class="clear-wrongs-btn" @tap.stop="clearWrongs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </view>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
@@ -140,7 +146,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getTotalQuestionCount, getWrongQuestions } from '@/utils/db'
+import { getTotalQuestionCount, getWrongQuestions, clearAllWrongs } from '@/utils/db'
 
 const statusBarHeight = ref(0)
 const totalQuestions = ref(0)
@@ -162,6 +168,20 @@ const loadData = async () => {
   totalQuestions.value = await getTotalQuestionCount()
   const wrongs = await getWrongQuestions()
   totalWrongs.value = wrongs.length
+}
+
+const clearWrongs = async () => {
+  uni.showModal({
+    title: '确认清除',
+    content: '确定要清除所有错题记录吗？',
+    success: async (res) => {
+      if (res.confirm) {
+        await clearAllWrongs()
+        await loadData()
+        uni.showToast({ title: '已清除', icon: 'success' })
+      }
+    }
+  })
 }
 
 const selectPreset = (n: number) => {
@@ -557,5 +577,23 @@ const goToTab = (url: string) => {
 
 .modal-btn.confirm .modal-btn-text {
   color: #FFFFFF;
+}
+
+.clear-wrongs-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: auto;
+  transition: all var(--transition-fast);
+}
+
+.clear-wrongs-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.9);
 }
 </style>

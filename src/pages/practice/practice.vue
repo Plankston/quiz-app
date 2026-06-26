@@ -1,88 +1,100 @@
 <template>
   <view class="container">
     <!-- 未完成状态 -->
-    <view v-if="!finished" class="practice-single">
-      <!-- 顶部 Sticky 进度条 -->
-      <view class="sticky-header">
-        <view class="progress-info">
-          <text class="progress-text">第 {{ currentIndex + 1 }}/{{ questions.length }} 题</text>
-          <text class="question-type" :class="questions[currentIndex]?.type">{{ typeText }}</text>
-          <view v-if="autoNextCountdown > 0" class="countdown-badge">
-            <text class="countdown-text">{{ autoNextCountdown }}s</text>
-          </view>
-        </view>
-        <view class="progress-bar">
-          <view class="progress-fill" :style="{ width: answeredPercent + '%' }"></view>
-        </view>
-      </view>
-
-      <!-- 题目内容区 -->
-      <view class="question-area">
-        <text class="question-content">{{ questions[currentIndex]?.content }}</text>
-        <view class="options">
-          <view
-            v-for="(option, i) in questions[currentIndex]?.options"
-            :key="i"
-            class="option-item"
-            :class="{
-              'selected': isOptionSelected(option)
-            }"
-            @tap="selectOption(option)"
-          >
-            <text class="option-label">{{ labels[i] }}.</text>
-            <text class="option-text">{{ option }}</text>
-            <view class="option-check" v-if="isOptionSelected(option)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+    <view v-if="!finished" class="practice-split">
+      <!-- 左侧题目区 70% -->
+      <view class="left-panel">
+        <!-- 题目内容区 -->
+        <view class="question-area">
+          <view class="question-type" :class="questions[currentIndex]?.type">{{ typeText }}</view>
+          <text class="question-content">{{ questions[currentIndex]?.content }}</text>
+          <view class="options">
+            <view
+              v-for="(option, i) in questions[currentIndex]?.options"
+              :key="i"
+              class="option-item"
+              :class="{
+                'selected': isOptionSelected(option)
+              }"
+              @tap="selectOption(option)"
+            >
+              <text class="option-label">{{ labels[i] }}.</text>
+              <text class="option-text">{{ option }}</text>
+              <view class="option-check" v-if="isOptionSelected(option)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </view>
             </view>
           </view>
         </view>
+
+        <!-- 底部操作栏 -->
+        <view class="bottom-bar">
+          <view class="bottom-left">
+            <view v-if="questions[currentIndex]?.type === 'multiple' && !autoNextTimer" class="confirm-btn" @tap="confirmMultiple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <text class="btn-text">确认</text>
+            </view>
+            <view v-else-if="autoNextTimer" class="auto-hint">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <text class="auto-hint-text">{{ autoNextCountdown }}s 后自动下一题</text>
+            </view>
+          </view>
+          <view class="finish-btn" @tap="confirmFinish">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <text class="btn-text">交卷</text>
+          </view>
+        </view>
       </view>
 
-      <!-- 底部操作栏 -->
-      <view class="bottom-bar">
-        <view class="bottom-left">
-          <view v-if="questions[currentIndex]?.type === 'multiple' && !autoNextTimer" class="confirm-btn" @tap="confirmMultiple">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <text class="btn-text">确认</text>
+      <!-- 右侧面板 30% -->
+      <view class="right-panel">
+        <!-- 右上：答题进度 -->
+        <view class="progress-section">
+          <view class="progress-info">
+            <text class="progress-text">第 {{ currentIndex + 1 }}/{{ questions.length }} 题</text>
           </view>
-          <view v-else-if="autoNextTimer" class="auto-hint">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+          <view class="progress-bar">
+            <view class="progress-fill" :style="{ width: answeredPercent + '%' }"></view>
+          </view>
+          <text class="progress-percent">{{ answeredPercent }}%</text>
+
+          <view v-if="autoNextCountdown > 0" class="countdown-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <text class="auto-hint-text">{{ autoNextCountdown }}s 后自动下一题</text>
+            <text class="countdown-text">{{ autoNextCountdown }}s 后自动下一题</text>
           </view>
         </view>
-        <view class="finish-btn" @tap="confirmFinish">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-          <text class="btn-text">交卷</text>
-        </view>
-      </view>
 
-      <!-- 底部横向滚动题号导航 -->
-      <scroll-view class="nav-strip" scroll-x :scroll-left="navScrollLeft" scroll-with-animation>
-        <view class="nav-items">
-          <view
-            v-for="(q, i) in questions"
-            :key="i"
-            class="nav-item"
-            :class="{
-              'active': i === currentIndex,
-              'answered': userAnswers[i] !== undefined && userAnswers[i] !== ''
-            }"
-            @tap="goToQuestion(i)"
-          >
-            <text class="nav-num">{{ i + 1 }}</text>
+        <!-- 右下：题号导航 -->
+        <scroll-view class="nav-panel" scroll-y>
+          <view class="nav-grid">
+            <view
+              v-for="(q, i) in questions"
+              :key="i"
+              class="nav-item"
+              :class="{
+                'active': i === currentIndex,
+                'answered': userAnswers[i] !== undefined && userAnswers[i] !== ''
+              }"
+              @tap="goToQuestion(i)"
+            >
+              <text class="nav-num">{{ i + 1 }}</text>
+            </view>
           </view>
-        </view>
-      </scroll-view>
+        </scroll-view>
+      </view>
     </view>
 
     <!-- 完成状态 -->
@@ -164,8 +176,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { getRandomQuestions, getAllRandomQuestions, getQuestionsByIds, addRecord, addWrong } from '@/utils/db'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { getRandomQuestions, getAllRandomQuestions, getQuestionsByIds, addRecord, addWrong, masterWrongByQuestionId } from '@/utils/db'
 
 const questions = ref<any[]>([])
 const currentIndex = ref(0)
@@ -186,8 +198,6 @@ let autoNextTimer: ReturnType<typeof setTimeout> | null = null
 let countdownInterval: ReturnType<typeof setInterval> | null = null
 const autoNextCountdown = ref(0)
 
-const navScrollLeft = ref(0)
-
 onMounted(() => {
   const pages = getCurrentPages()
   const page = pages[pages.length - 1] as any
@@ -201,12 +211,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearAutoNext()
-})
-
-// 自动滚动导航到当前题号
-watch(currentIndex, (idx) => {
-  // 每个导航项约 36px + 6px gap = 42px
-  navScrollLeft.value = Math.max(0, idx * 42 - 150)
 })
 
 const clearAutoNext = () => {
@@ -354,7 +358,7 @@ const finishPractice = async () => {
     if (type === 'judge') {
       return answer.split(',').map(ch => {
         const idx = labels.indexOf(ch)
-        return idx >= 0 ? options[idx] : ch
+        return idx >= 0 && options[idx] ? options[idx] : ch
       }).join(',')
     }
     if (type === 'multiple') {
@@ -376,6 +380,8 @@ const finishPractice = async () => {
     if (!isCorrect && q.id) {
       await addWrong(q.id)
       newWrong.push({ ...q, yourAnswer: userLetter || '(未作答)' })
+    } else if (isCorrect && q.id) {
+      await masterWrongByQuestionId(q.id)
     }
   }
 
@@ -457,76 +463,33 @@ const retryAll = () => {
   background: #F0FDFA;
 }
 
-/* ===== 单列布局 (Flat Design) ===== */
-.practice-single {
+/* ===== 左右分栏布局 7:3 ===== */
+.practice-split {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.left-panel {
+  flex: 7;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding-bottom: 110px; /* 为底部题号导航留空间 */
+  overflow-y: auto;
+  border-right: 1px solid #E2E8F0;
 }
 
-/* Sticky 顶部进度条 */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #FFFFFF;
-  padding: 12px 16px;
-  border-bottom: 1px solid #E2E8F0;
-}
-
-.progress-info {
+.right-panel {
+  flex: 3;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  background: #FFFFFF;
+  overflow: hidden;
 }
 
-.progress-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.question-type {
-  font-size: 12px;
-  padding: 3px 10px;
-  border-radius: var(--radius-sm);
-  color: #fff;
-  font-weight: 600;
-}
-.question-type.single { background: #0D9488; }
-.question-type.multiple { background: #F59E0B; }
-.question-type.judge { background: #22C55E; }
-
-.countdown-badge {
-  margin-left: auto;
-  background: #F0FDFA;
-  padding: 3px 10px;
-  border-radius: var(--radius-sm);
-}
-.countdown-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: #0D9488;
-}
-
-.progress-bar {
-  height: 6px;
-  background: #E2E8F0;
-  border-radius: var(--radius-full);
-}
-.progress-fill {
-  height: 100%;
-  background: #0D9488;
-  border-radius: var(--radius-full);
-  transition: width 0.3s ease;
-}
-
-/* 题目内容区 */
+/* ===== 左侧：题目区 ===== */
 .question-area {
   flex: 1;
-  padding: 20px 16px;
+  padding: 24px 20px;
 }
 
 .question-content {
@@ -556,7 +519,6 @@ const retryAll = () => {
   transform: scale(0.98);
 }
 
-/* 选中态: teal 边框 + 浅 teal 背景 */
 .option-item.selected {
   border-color: #0D9488;
   background: #F0FDFA;
@@ -598,7 +560,7 @@ const retryAll = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 14px 20px;
   background: #FFFFFF;
   border-top: 1px solid #E2E8F0;
 }
@@ -658,36 +620,95 @@ const retryAll = () => {
   font-size: 14px;
 }
 
-/* 底部横向滚动题号导航 */
-.nav-strip {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #FFFFFF;
-  border-top: 1px solid #E2E8F0;
-  padding: 10px 0;
-  z-index: 100;
-  white-space: nowrap;
+/* ===== 右侧：进度 + 导航 ===== */
+.progress-section {
+  padding: 16px;
+  border-bottom: 1px solid #E2E8F0;
 }
 
-.nav-items {
-  display: inline-flex;
+.progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.question-type {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+.question-type.single { background: #0D9488; }
+.question-type.multiple { background: #F59E0B; }
+.question-type.judge { background: #22C55E; }
+
+.progress-bar {
+  height: 6px;
+  background: #E2E8F0;
+  border-radius: var(--radius-full);
+  margin-bottom: 6px;
+}
+.progress-fill {
+  height: 100%;
+  background: #0D9488;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.progress-percent {
+  font-size: 12px;
+  color: #64748B;
+}
+
+.countdown-badge {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  padding: 0 16px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  background: #F0FDFA;
+  border-radius: var(--radius-sm);
+}
+.countdown-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #0D9488;
+}
+
+/* 题号导航网格 */
+.nav-panel {
+  flex: 1;
+  padding: 12px;
+  min-height: 0;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
 }
 
 .nav-item {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: 4px;
   background: #F1F5F9;
-  border: 2px solid transparent;
+  border: 1.5px solid transparent;
   transition: all 0.2s ease;
-  flex-shrink: 0;
+  cursor: pointer;
 }
 .nav-item:active {
   transform: scale(0.9);
@@ -697,20 +718,21 @@ const retryAll = () => {
   background: #F0FDFA;
 }
 .nav-item.answered {
-  background: #ECFDF5;
-  border-color: #22C55E;
+  background: #D1FAE5;
+  border-color: transparent;
 }
 .nav-item.answered.active {
   border-color: #0D9488;
   background: #F0FDFA;
 }
+
 .nav-num {
-  font-size: 13px;
+  font-size: 11px;
   color: #334155;
   font-weight: 500;
 }
 .nav-item.answered .nav-num {
-  color: #22C55E;
+  color: #059669;
   font-weight: 600;
 }
 
@@ -744,7 +766,6 @@ const retryAll = () => {
   color: var(--text-primary);
 }
 
-/* 2×2 KPI 网格 */
 .result-kpi-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -863,7 +884,6 @@ const retryAll = () => {
   line-height: 1.5;
 }
 
-/* Flat Design: 纯色按钮 */
 .review-btn {
   display: flex;
   align-items: center;
@@ -908,11 +928,39 @@ const retryAll = () => {
   font-size: 15px;
 }
 
-/* Flat Design: 纯色按钮 */
 .back-btn {
   background: #64748B;
 }
 .retry-btn {
   background: #0D9488;
+}
+
+/* ===== 响应式：移动端切换为单列 ===== */
+@media (max-width: 768px) {
+  .practice-split {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .left-panel {
+    flex: none;
+    border-right: none;
+    min-height: auto;
+  }
+  
+  .right-panel {
+    flex: none;
+    min-height: auto;
+    border-top: 1px solid #E2E8F0;
+  }
+  
+  .nav-panel {
+    max-height: 200px;
+  }
+  
+  .nav-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
 }
 </style>

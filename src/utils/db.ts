@@ -117,6 +117,15 @@ export const getWrongWithDetails = async () => {
 
 export const masterWrong = (id: number) => db.wrongs.update(id, { isMastered: 1 })
 
+export const masterWrongByQuestionId = async (questionId: number) => {
+  const existing = await db.wrongs.where('questionId').equals(questionId).first()
+  if (existing) {
+    await db.wrongs.update(existing.id!, { isMastered: 1 })
+  }
+}
+
+export const clearAllWrongs = () => db.wrongs.clear()
+
 export const getStats = async () => {
   const totalBanks = await db.banks.count()
   const totalQuestions = await db.questions.count()
