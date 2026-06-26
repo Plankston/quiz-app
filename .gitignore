@@ -22,3 +22,8 @@ dist
 
 # Windows Zone.Identifier files
 *:Zone.Identifier
+
+# Local test files (not for repo)
+tests/
+playwright-report/
+test-results/

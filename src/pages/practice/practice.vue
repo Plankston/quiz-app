@@ -21,9 +21,7 @@
               <text class="option-label">{{ labels[i] }}.</text>
               <text class="option-text">{{ option }}</text>
               <view class="option-check" v-if="isOptionSelected(option)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
+                <IconSet name="check" :size="16" :stroke-width="2.5" />
               </view>
             </view>
           </view>
@@ -33,24 +31,16 @@
         <view class="bottom-bar">
           <view class="bottom-left">
             <view v-if="questions[currentIndex]?.type === 'multiple' && !autoNextTimer" class="confirm-btn" @tap="confirmMultiple">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <IconSet name="check" :size="18" :stroke-width="2.5" />
               <text class="btn-text">确认</text>
             </view>
             <view v-else-if="autoNextTimer" class="auto-hint">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
+              <IconSet name="clock" :size="16" color="#64748B" />
               <text class="auto-hint-text">{{ autoNextCountdown }}s 后自动下一题</text>
             </view>
           </view>
           <view class="finish-btn" @tap="confirmFinish">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+            <IconSet name="check_circle" :size="18" :stroke-width="2.5" />
             <text class="btn-text">交卷</text>
           </view>
         </view>
@@ -70,10 +60,7 @@
           <text class="progress-percent">{{ answeredPercent }}%</text>
 
           <view v-if="autoNextCountdown > 0" class="countdown-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
+            <IconSet name="clock" :size="14" color="#0D9488" />
             <text class="countdown-text">{{ autoNextCountdown }}s 后自动下一题</text>
           </view>
         </view>
@@ -102,10 +89,7 @@
     <view v-else class="result-area">
       <view class="result-header">
         <view class="result-icon-wrapper">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
+          <IconSet name="check_circle" :size="48" color="#FFFFFF" />
         </view>
         <text class="result-title">练习完成</text>
       </view>
@@ -148,27 +132,18 @@
           </view>
         </scroll-view>
         <view class="review-btn" @tap="startReview">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="1 4 1 10 7 10"></polyline>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-          </svg>
+          <IconSet name="rotate_ccw" :size="18" :stroke-width="2.5" />
           <text class="btn-text">错题复考</text>
         </view>
       </view>
 
       <view class="action-buttons">
         <view class="back-btn" @tap="goBack">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
+          <IconSet name="arrow_left" :size="18" :stroke-width="2.5" />
           <text class="btn-text">返回题库</text>
         </view>
         <view class="retry-btn" @tap="retryAll">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-          </svg>
+          <IconSet name="rotate_cw" :size="18" :stroke-width="2.5" />
           <text class="btn-text">重新刷题</text>
         </view>
       </view>
@@ -179,6 +154,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { getRandomQuestions, getAllRandomQuestions, getQuestionsByIds, addRecord, addWrong, masterWrongByQuestionId, getExamQuestions, getRandomQuestionsByType, getRandomQuestionsByBankAndType } from '@/utils/db'
+import IconSet from '@/components/IconSet.vue'
 
 const questions = ref<any[]>([])
 const currentIndex = ref(0)
@@ -197,8 +173,8 @@ const typeValue = ref('') // 题型值：single, multiple, judge
 
 const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-let autoNextTimer: ReturnType<typeof setTimeout> | null = null
-let countdownInterval: ReturnType<typeof setInterval> | null = null
+const autoNextTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const countdownInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const autoNextCountdown = ref(0)
 
 onMounted(() => {
@@ -219,13 +195,13 @@ onUnmounted(() => {
 })
 
 const clearAutoNext = () => {
-  if (autoNextTimer) {
-    clearTimeout(autoNextTimer)
-    autoNextTimer = null
+  if (autoNextTimer.value) {
+    clearTimeout(autoNextTimer.value)
+    autoNextTimer.value = null
   }
-  if (countdownInterval) {
-    clearInterval(countdownInterval)
-    countdownInterval = null
+  if (countdownInterval.value) {
+    clearInterval(countdownInterval.value)
+    countdownInterval.value = null
   }
   autoNextCountdown.value = 0
 }
@@ -233,15 +209,15 @@ const clearAutoNext = () => {
 const startAutoNext = () => {
   clearAutoNext()
   autoNextCountdown.value = 3
-  countdownInterval = setInterval(() => {
+  countdownInterval.value = setInterval(() => {
     autoNextCountdown.value--
     if (autoNextCountdown.value <= 0) {
-      if (countdownInterval) clearInterval(countdownInterval)
-      countdownInterval = null
+      if (countdownInterval.value) clearInterval(countdownInterval.value)
+      countdownInterval.value = null
     }
   }, 1000)
-  autoNextTimer = setTimeout(() => {
-    autoNextTimer = null
+  autoNextTimer.value = setTimeout(() => {
+    autoNextTimer.value = null
     clearAutoNext()
     nextQuestion()
   }, 3000)

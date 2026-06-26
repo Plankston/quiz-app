@@ -79,6 +79,45 @@
   }
 }
 
+/* ========== 深色模式 ========== */
+[data-theme="dark"] {
+  /* 主色调 - 深色模式下更亮 */
+  --color-primary: #14B8A6;
+  --color-primary-light: #2DD4BF;
+  --color-primary-dark: #0D9488;
+  --color-primary-50: #042F2E;
+  --color-primary-100: #064E3B;
+
+  /* 辅助色 */
+  --color-secondary: #94A3B8;
+
+  /* 背景色 */
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-card: #1E293B;
+  --bg-hover: #334155;
+  --bg-muted: #1E293B;
+
+  /* 文字色 */
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-inverse: #0F172A;
+  --text-disabled: #475569;
+
+  /* 边框色 */
+  --border-light: #334155;
+  --border-medium: #475569;
+  --border-focus: #14B8A6;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.3);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.4);
+  --shadow-focus: 0 0 0 3px rgba(20, 184, 166, 0.3);
+}
+
 /* ========== uni-app 内置变量覆盖 ========== */
 
 /* 行为相关颜色 */

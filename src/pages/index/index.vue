@@ -12,40 +12,27 @@
     <view class="actions-section">
       <view class="action-card primary" @tap="openModal" hover-class="action-press">
         <view class="action-icon primary-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
+          <IconSet name="play" :size="22" color="#fff" />
         </view>
         <view class="action-info">
           <text class="action-title">开始答题</text>
           <text class="action-desc">从所有题库中随机出题</text>
         </view>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        <IconSet name="chevron_right" :size="16" color="rgba(255,255,255,0.5)" :stroke-width="2.5" />
       </view>
 
       <view class="action-card danger" @tap="goToWrong" hover-class="action-press">
         <view class="action-icon danger-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-          </svg>
+          <IconSet name="x_circle" :size="22" color="#fff" />
         </view>
         <view class="action-info">
           <text class="action-title">错题重考</text>
           <text class="action-desc">{{ totalWrongs }}道错题待复习</text>
         </view>
         <view v-if="totalWrongs > 0" class="clear-wrongs-btn" @tap.stop="clearWrongs">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
+          <IconSet name="trash" :size="14" />
         </view>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        <IconSet name="chevron_right" :size="16" color="rgba(255,255,255,0.5)" :stroke-width="2.5" />
       </view>
     </view>
 
@@ -55,22 +42,9 @@
       <view class="quick-grid">
         <view class="quick-item" @tap="goToTab('/pages/bank/bank')" hover-class="action-press">
           <view class="quick-icon blue">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
+            <IconSet name="book" :size="20" />
           </view>
           <text class="quick-label">题库管理</text>
-        </view>
-        <view class="quick-item" @tap="goToTab('/pages/stats/stats')" hover-class="action-press">
-          <view class="quick-icon green">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-          </view>
-          <text class="quick-label">学习统计</text>
         </view>
       </view>
     </view>
@@ -78,11 +52,7 @@
     <!-- 空状态提示 -->
     <view class="empty-hint" v-if="totalQuestions === 0">
       <view class="empty-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
+        <IconSet name="info_circle" :size="24" color="#0D9488" :stroke-width="1.5" />
       </view>
       <text class="empty-text">还没有导入题库</text>
       <text class="empty-sub">点击底部「题库」标签导入Excel文件开始刷题</text>
@@ -94,10 +64,7 @@
         <view class="modal-header">
           <text class="modal-title">{{ practiceMode ? (practiceMode === 'exam' ? '模拟考试' : '专项训练') : '选择刷题方式' }}</text>
           <view class="modal-close" @tap="showCountModal = false">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <IconSet name="x" :size="18" />
           </view>
         </view>
         <text class="modal-hint" v-if="!practiceMode">共 {{ totalQuestions }} 题可用</text>
@@ -106,36 +73,24 @@
         <view v-if="!practiceMode" class="mode-selection">
           <view class="mode-card exam" @tap="practiceMode = 'exam'">
             <view class="mode-icon exam-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
+              <IconSet name="file_text" :size="24" />
             </view>
             <view class="mode-info">
               <text class="mode-title">模拟考试</text>
               <text class="mode-desc">固定150题，按判断:单选:多选=2:5:3出题</text>
             </view>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <IconSet name="chevron_right" :size="16" color="#94A3B8" />
           </view>
 
           <view class="mode-card special" @tap="practiceMode = 'special'">
             <view class="mode-icon special-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
+              <IconSet name="star" :size="24" />
             </view>
             <view class="mode-info">
               <text class="mode-title">专项训练</text>
               <text class="mode-desc">按题型或科目针对性练习</text>
             </view>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <IconSet name="chevron_right" :size="16" color="#94A3B8" />
           </view>
         </view>
 
@@ -143,14 +98,7 @@
         <view v-if="practiceMode === 'special' && !specialType" class="special-type-selection">
           <view class="special-type-card" @tap="specialType = 'type'">
             <view class="special-type-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="8" y1="6" x2="21" y2="6"></line>
-                <line x1="8" y1="12" x2="21" y2="12"></line>
-                <line x1="8" y1="18" x2="21" y2="18"></line>
-                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-              </svg>
+              <IconSet name="list" :size="20" />
             </view>
             <text class="special-type-title">题型专项</text>
             <text class="special-type-desc">单选/多选/判断</text>
@@ -158,10 +106,7 @@
 
           <view class="special-type-card" @tap="specialType = 'bank'">
             <view class="special-type-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
+              <IconSet name="book" :size="20" />
             </view>
             <text class="special-type-title">科目专项</text>
             <text class="special-type-desc">按题库分类</text>
@@ -262,6 +207,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import IconSet from '@/components/IconSet.vue'
 import { getTotalQuestionCount, getWrongQuestions, clearAllWrongs, getBanks, getExamQuestions, getRandomQuestionsByType, getRandomQuestionsByBankAndType } from '@/utils/db'
 
 const statusBarHeight = ref(0)

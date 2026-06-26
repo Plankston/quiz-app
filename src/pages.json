@@ -13,10 +13,6 @@
       "style": { "navigationStyle": "custom" }
     },
     {
-      "path": "pages/stats/stats",
-      "style": { "navigationStyle": "custom" }
-    },
-    {
       "path": "pages/practice/practice",
       "style": { "navigationStyle": "custom" }
     }
@@ -46,10 +42,6 @@
       {
         "pagePath": "pages/wrong/wrong",
         "text": "错题"
-      },
-      {
-        "pagePath": "pages/stats/stats",
-        "text": "统计"
       }
     ]
   }

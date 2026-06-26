@@ -9,41 +9,28 @@
     <view class="overview-grid">
       <view class="stat-card blue">
         <view class="stat-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
+          <IconSet name="book" :size="20" />
         </view>
         <text class="stat-value">{{ stats.totalBanks }}</text>
         <text class="stat-label">题库数</text>
       </view>
       <view class="stat-card cyan">
         <view class="stat-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
+          <IconSet name="help_circle" :size="20" />
         </view>
         <text class="stat-value">{{ stats.totalQuestions }}</text>
         <text class="stat-label">总题数</text>
       </view>
       <view class="stat-card green">
         <view class="stat-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 11 12 14 22 4"></polyline>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-          </svg>
+          <IconSet name="clipboard_check" :size="20" />
         </view>
         <text class="stat-value">{{ stats.totalRecords }}</text>
         <text class="stat-label">答题数</text>
       </view>
       <view class="stat-card orange">
         <view class="stat-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
+          <IconSet name="check_circle" :size="20" />
         </view>
         <text class="stat-value rate">{{ stats.correctRate }}%</text>
         <text class="stat-label">正确率</text>
@@ -80,18 +67,11 @@
       :padding="60"
     >
       <template #icon>
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 20V10"></path>
-          <path d="M12 20V4"></path>
-          <path d="M6 20v-6"></path>
-        </svg>
+        <IconSet name="bar_chart_styled" :size="40" color="#0D9488" :strokeWidth="1.5" />
       </template>
       <template #action>
         <view class="empty-cta" @tap="goToBank" hover-class="action-press">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
+          <IconSet name="book" :size="16" />
           <text>去导入题库</text>
         </view>
       </template>
@@ -103,6 +83,7 @@
 import { ref, onMounted } from 'vue'
 import { getStats, getBanks, getChapterStats } from '@/utils/db'
 import AppEmpty from '@/components/AppEmpty.vue'
+import IconSet from '@/components/IconSet.vue'
 
 const stats = ref({
   totalBanks: 0,

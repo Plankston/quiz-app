@@ -5,10 +5,7 @@
       <view class="header-main">
         <text class="title">题库管理</text>
         <view class="import-btn" @tap="importExcel" hover-class="action-press">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
+          <IconSet name="plus" :size="16" :stroke-width="2.5" />
           <text>导入</text>
         </view>
       </view>
@@ -18,10 +15,7 @@
     <view class="bank-list" v-if="banks.length > 0">
       <view class="bank-card" v-for="bank in banks" :key="bank.id" @tap="startPractice(bank)">
         <view class="bank-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
+          <IconSet name="book" :size="22" />
         </view>
         <view class="bank-info">
           <text class="bank-name">{{ bank.name }}</text>
@@ -29,10 +23,7 @@
         </view>
         <view class="bank-actions" @tap.stop>
           <view class="delete-btn" @tap="deleteBank(bank.id!)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
+            <IconSet name="trash" :size="16" />
           </view>
         </view>
       </view>
@@ -46,21 +37,14 @@
       :padding="80"
     >
       <template #icon>
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-        </svg>
+        <IconSet name="book" :size="40" color="#0D9488" :stroke-width="1.5" />
       </template>
     </AppEmpty>
 
     <!-- 格式提示 -->
     <view class="tips" v-if="banks.length > 0">
       <view class="tips-header">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
+        <IconSet name="info_circle" :size="14" />
         <text>支持的Excel格式</text>
       </view>
       <view class="tips-content">
@@ -73,6 +57,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import IconSet from '@/components/IconSet.vue'
 import { getBanks, addBank } from '@/utils/db'
 import db from '@/utils/db'
 import { parseExcel } from '@/utils/parser'
