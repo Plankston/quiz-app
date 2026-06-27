@@ -350,14 +350,16 @@ const finishPractice = async () => {
 
   const normalizeForCompare = (answer: string, type: string, options: string[]): string => {
     if (!answer) return ''
+    // 统一分隔符：中文顿号、空格等转为英文逗号
+    const sep = (s: string) => s.replace(/[、，\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '')
     if (type === 'judge') {
-      return answer.split(',').map(ch => {
+      return sep(answer).split(',').map(ch => {
         const idx = labels.indexOf(ch)
         return idx >= 0 && options[idx] ? options[idx] : ch
       }).join(',')
     }
     if (type === 'multiple') {
-      return answer.split(',').filter(Boolean).sort().join(',')
+      return sep(answer).split(',').filter(Boolean).sort().join(',')
     }
     return answer
   }
