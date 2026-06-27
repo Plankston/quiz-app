@@ -14,7 +14,7 @@ const normalizeType = (type: string): string => {
   if (!type) return 'single'
   const t = type.toLowerCase()
   if (t.includes('判断') || t.includes('对错')) return 'judge'
-  if (t.includes('多选') || t.includes('复选') || t.includes('multiple') || t.includes('multi-choice') || t.includes('multi choice')) return 'multiple'
+  if (t.includes('多选') || t.includes('multiple')) return 'multiple'
   return 'single'
 }
 
@@ -32,27 +32,6 @@ const normalizeJudgeOption = (option: string): string => {
   if (['正确', '√', '✓'].includes(option)) return '对'
   if (['错误', '×', '✗'].includes(option)) return '错'
   return option
-}
-
-/**
- * 根据答案内容推断是否为多选题：
- * 含有2个以上有效字母选项（如 ABC、A,B,C、A、B、C）即判定为多选
- */
-const isMultipleAnswer = (answer: string, optionsCount: number): boolean => {
-  if (!answer || optionsCount < 3) return false
-  // 统一分隔符后拆分
-  const normalized = answer.replace(/[、，\s]+/g, ',')
-  const parts = normalized.split(',').filter(Boolean)
-  // 至少2个有效字母选项
-  return parts.length >= 2 && parts.every(p => /^[A-Ha-h]$/.test(p.trim()))
-}
-
-/**
- * 统一答案分隔符：中文顿号、空格等统一转为英文逗号
- */
-const normalizeAnswerSeparators = (answer: string): string => {
-  if (!answer) return ''
-  return answer.replace(/[、，\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '')
 }
 
 const isJudgeOptions = (options: string[]): boolean => {
@@ -100,11 +79,6 @@ const parseStandardFormat = (rows: any[][]): ParsedQuestion[] => {
       type = 'judge'
     }
 
-    // Auto-detect multi-select questions by answer format (fallback when type is wrong/empty)
-    if (type === 'single' && isMultipleAnswer(row[answerIdx] || '', rawOptions.length)) {
-      type = 'multiple'
-    }
-
     let options: string[]
     let answer: string
 
@@ -113,7 +87,7 @@ const parseStandardFormat = (rows: any[][]): ParsedQuestion[] => {
       answer = normalizeJudgeAnswer(row[answerIdx] || '')
     } else {
       options = rawOptions.map(normalizeJudgeOption)
-      answer = normalizeAnswerSeparators((row[answerIdx] || '').trim())
+      answer = (row[answerIdx] || '').trim()
     }
 
     questions.push({
